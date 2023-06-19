@@ -18,7 +18,7 @@ jobs:
       run: make
 
     - name: Build unit tests for minheap
-      run: make -f unit_tests/minheap/minheap_test.mk
+      run: cd unit_tests/minheap/ && make -f minheap_test.mk
 
   tests:
     needs: build
