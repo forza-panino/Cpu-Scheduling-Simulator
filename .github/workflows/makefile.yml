@@ -14,5 +14,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Build
+    - name: Build core
       run: make
+
+    - name: Build unit tests for minheap
+      run: make -f unit_tests/minheap/minheap_test.mk
+
+  tests:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run unit tests for minheap with generics
+      run: ./unit_tests/minheap/test_with_generics.out
