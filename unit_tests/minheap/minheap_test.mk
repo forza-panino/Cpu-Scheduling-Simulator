@@ -34,4 +34,4 @@ test_with_specialised:	test_with_specialised.c $(EXT_OBJS)
 	$(CC) $(CCOPTS) -o $@.out $^
 
 clean:
-	rm -rf *.o *~ $(OBJS) $(EXT_OBJS) $(BINS)
+	rm -rf *.o *~ $(OBJS) $(EXT_OBJS) $(addsuffix .out, $(BINS))
