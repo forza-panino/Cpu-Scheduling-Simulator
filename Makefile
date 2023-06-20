@@ -1,5 +1,6 @@
 CC=gcc
-CCOPTS=--std=gnu99 -Wall -D_LIST_DEBUG_ 
+CCOPTS=--std=gnu99 -Wall -D_LIST_DEBUG_
+CCLIBS=-lm
 AR=ar
 
 OBJS=linked_list.o\
@@ -21,10 +22,10 @@ all:	$(BINS)
 	$(CC) $(CCOPTS) -c -o $@  $<
 
 fake_process_test:	fake_process_test.c $(OBJS)
-	$(CC) $(CCOPTS) -o $@ $^
+	$(CC) $(CCOPTS) -o $@.out $^ $(CCLIBS)
 
 sched_sim:	sched_sim.c $(OBJS)
-	$(CC) $(CCOPTS) -o $@.out $^
+	$(CC) $(CCOPTS) -o $@.out $^ $(CCLIBS)
 
 clean:
-	rm -rf *.o *~ $(OBJS) $(BINS)
+	rm -rf *.o *~ $(OBJS) $(addsuffix .out, $(BINS))

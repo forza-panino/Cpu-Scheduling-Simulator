@@ -1,8 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 #include "fake_os.h"
+
+#define MEASURE_WEIGHT 0.35
+#define DEFAULT_PREDICTION 1
+
 
 void FakeOS_init(FakeOS* os) {
   os->running=0;
@@ -11,6 +16,13 @@ void FakeOS_init(FakeOS* os) {
   List_init(&os->processes);
   os->timer=0;
   os->schedule_fn=0;
+}
+
+void updatePredictionPCB(FakePCB* pcb) {
+  int old_prediction = pcb->predicted_duration;
+  int measure = pcb->real_duration;
+  int new_prediction = round(MEASURE_WEIGHT*measure + (1-MEASURE_WEIGHT)*old_prediction);
+  pcb->predicted_duration = new_prediction;
 }
 
 void FakeOS_createProcess(FakeOS* os, FakeProcess* p) {
@@ -39,6 +51,8 @@ void FakeOS_createProcess(FakeOS* os, FakeProcess* p) {
   new_pcb->list.next=new_pcb->list.prev=0;
   new_pcb->pid=p->pid;
   new_pcb->events=p->events;
+  new_pcb->predicted_duration=DEFAULT_PREDICTION;
+  new_pcb->real_duration=0;
 
   assert(new_pcb->events.first && "process without events");
 
@@ -122,7 +136,9 @@ void FakeOS_simStep(FakeOS* os){
   
 
   // decrement the duration of running
+  // increment real duration of runningpcb
   // if event over, destroy event
+  // if next event IO, update CPU burst prediction and reset real duration
   // and reschedule process
   // if last event, destroy running
   FakePCB* running=os->running;
@@ -131,6 +147,7 @@ void FakeOS_simStep(FakeOS* os){
     ProcessEvent* e=(ProcessEvent*) running->events.first;
     assert(e->type==CPU);
     e->duration--;
+    running->real_duration++;
     printf("\t\tremaining time:%d\n",e->duration);
     if (e->duration==0){
       printf("\t\tend burst\n");
@@ -148,6 +165,11 @@ void FakeOS_simStep(FakeOS* os){
           break;
         case IO:
           printf("\t\tmove to waiting\n");
+          printf("\t\told prediction: %d\n", running->predicted_duration);
+          printf("\t\treal duration: %d\n", running->real_duration);
+          updatePredictionPCB(running);
+          printf("\t\tnew prediction: %d\n", running->predicted_duration);
+          running->real_duration=0;
           List_pushBack(&os->waiting, (ListItem*) running);
           break;
         }

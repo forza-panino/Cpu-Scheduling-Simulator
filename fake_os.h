@@ -7,6 +7,12 @@ typedef struct {
   ListItem list;
   int pid;
   ListHead events;
+
+//### added for burst time prediction
+  int real_duration;
+  int predicted_duration;
+//###
+
 } FakePCB;
 
 struct FakeOS;
@@ -26,3 +32,4 @@ typedef struct FakeOS{
 void FakeOS_init(FakeOS* os);
 void FakeOS_simStep(FakeOS* os);
 void FakeOS_destroy(FakeOS* os);
+void updatePredictionPCB(FakePCB* pcb);
