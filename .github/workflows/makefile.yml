@@ -20,11 +20,17 @@ jobs:
     - name: Build unit tests for minheap
       run: cd unit_tests/minheap/ && make -f minheap_test.mk
       
-    - name: Upload minheap unit tests build artifact
+    - name: Upload minheap unit test build artifact for generics
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: minheap_unit_test_artifact
+        name: minheap_unit_test_artifact_generics
         path: unit_tests/minheap/test_with_generics.out
+
+    - name: Upload minheap unit test build artifact for specialised types
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: minheap_unit_test_artifact_specialised
+        path: unit_tests/minheap/test_with_specialised.out
 
   tests:
     needs: build
@@ -36,11 +42,19 @@ jobs:
     
     - uses: actions/download-artifact@master
       with:
-        name: minheap_unit_test_artifact
+        name: minheap_unit_test_artifact_generics
+        path: unit_tests/minheap/
+
+    - uses: actions/download-artifact@master
+      with:
+        name: minheap_unit_test_artifact_specialised
         path: unit_tests/minheap/
     
-    - name: enable execution permission of artifcat
-      run: chmod +x unit_tests/minheap/test_with_generics.out
+    - name: enable execution permission of artifacts
+      run: chmod +x unit_tests/minheap/*.out
 
     - name: Run unit tests for minheap with generics
       run: ./unit_tests/minheap/test_with_generics.out
+
+    - name: Run unit tests for minheap with specialised types
+      run: ./unit_tests/minheap/test_with_specialised.out
