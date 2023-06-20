@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     {{.key = 3}, {.pid = 3}}
     };
 
-    Heap heap;
+    MinHeap heap;
 	Heap_init(&heap);
 
     Heap_insert(&heap, (HeapItem*) &heapItems[0]);

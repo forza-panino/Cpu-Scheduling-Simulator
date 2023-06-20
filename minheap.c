@@ -1,13 +1,13 @@
 #include "minheap.h"
 #include <stdlib.h>
 
-void Heap_init(Heap* heap) {
+void Heap_init(MinHeap* heap) {
 	heap->size=0;
 	heap->capacity=1;
 	heap->items=(HeapItem**)malloc(sizeof(HeapItem*)*heap->capacity);
 }
 
-void Heap_insert(Heap* heap, HeapItem* item) {
+void Heap_insert(MinHeap* heap, HeapItem* item) {
   if (heap->size==heap->capacity) {
 		heap->capacity*=2;
 		heap->items=(HeapItem**)realloc(heap->items, sizeof(HeapItem*)*heap->capacity);
@@ -28,7 +28,7 @@ void Heap_insert(Heap* heap, HeapItem* item) {
   }
 }
 
-HeapItem* Heap_extractMin(Heap* heap) {
+HeapItem* Heap_extractMin(MinHeap* heap) {
   if (heap->size==0)
     return 0;
   HeapItem* min=heap->items[0];
@@ -56,7 +56,7 @@ HeapItem* Heap_extractMin(Heap* heap) {
 }
 
 #ifdef _HEAP_DEBUG_
-void Heap_fill_null(Heap* heap, int num_nulls) {
+void Heap_fill_null(MinHeap* heap, int num_nulls) {
   for (int i=0; i<num_nulls; ++i){
 		if (heap->size==heap->capacity) {
 			heap->capacity*=2;

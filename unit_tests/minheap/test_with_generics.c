@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void test_init() {
-  Heap heap;
+  MinHeap heap;
   Heap_init(&heap);
   assert(heap.size==0);
   assert(heap.capacity==1);
@@ -12,7 +12,7 @@ void test_init() {
 }
 
 void test_fill_null() {
-  Heap heap;
+  MinHeap heap;
   Heap_init(&heap);
   Heap_fill_null(&heap, 10);
   assert(heap.size==10);
@@ -28,7 +28,7 @@ void test_fill_null() {
 }
 
 void test_insert_1() {
-	Heap heap;
+	MinHeap heap;
 	Heap_init(&heap);
 	HeapItem item1={.key=1};
 	HeapItem item2={.key=2};
@@ -85,7 +85,7 @@ void test_insert_1() {
 }
 
 void test_insert_2() {
-	Heap heap;
+	MinHeap heap;
 	Heap_init(&heap);
 	HeapItem item5={.key=5};
 	HeapItem item7={.key=7};
@@ -142,7 +142,7 @@ void test_insert_2() {
 }
 
 void test_extractMin_1() {
-	Heap heap;
+	MinHeap heap;
 	Heap_init(&heap);
 	HeapItem item1={.key=1};
 	HeapItem item2={.key=2};
@@ -224,7 +224,7 @@ void test_extractMin_1() {
 }
 
 void test_extractMin_2() {
-	Heap heap;
+	MinHeap heap;
 	Heap_init(&heap);
 	HeapItem item5={.key=5};
 	HeapItem item7={.key=7};
