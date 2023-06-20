@@ -22,7 +22,7 @@ all:	$(BINS)
 	$(CC) $(CCOPTS) -c -o $@  $<
 
 fake_process_test:	fake_process_test.c $(OBJS)
-	$(CC) $(CCOPTS) -o $@ $^ $(CCLIBS)
+	$(CC) $(CCOPTS) -o $@.out $^ $(CCLIBS)
 
 sched_sim:	sched_sim.c $(OBJS)
 	$(CC) $(CCOPTS) -o $@.out $^ $(CCLIBS)
