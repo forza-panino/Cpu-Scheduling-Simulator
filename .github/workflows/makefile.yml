@@ -64,8 +64,11 @@ jobs:
         name: burst_prediction_unit_test_artifact
         path: unit_tests/burst_prediction/
     
-    - name: enable execution permission of artifacts
-      run: chmod +x -R unit_tests/*.out
+    - name: enable execution permission of minheap artifacts
+      run: chmod +x unit_tests/minheap/*.out
+
+    - name: enable execution permission of burst prediction artifacts
+      run: chmod +x unit_tests/burst_prediction/*.out
 
     - name: Run unit tests for minheap with generics
       run: ./unit_tests/minheap/test_with_generics.out
