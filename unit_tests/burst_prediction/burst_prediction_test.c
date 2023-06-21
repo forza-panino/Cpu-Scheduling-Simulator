@@ -1,5 +1,3 @@
-// main function
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -12,7 +10,6 @@
 
 void scan(int datas[][MAX_BURSTS][BURST_DATA_SIZE], int pids[], FILE* output_file) {
 
-    // scan each line
     int pid = -1;
     char *buffer=NULL;
     size_t line_length=0;
@@ -56,12 +53,15 @@ void test1() {
     };
 
     int pids[4] = {0, 0, 0, 0};
+    int pipefd[2];
+    pipe(pipefd);
 
     int pid = fork();
     if (pid == 0) {
         
-        FILE* output_file = fopen("examples/example1/output.log", "w");
-        dup2(fileno(output_file), 1);
+        close(pipefd[0]);
+        dup2(pipefd[1], 1);
+        close(pipefd[1]);
 
         char* args[6] = {
             "./sched_sim.out", 
@@ -80,10 +80,11 @@ void test1() {
         waitpid(pid, &status, 0);
         assert(status == 0);
 
-        FILE* output_file = fopen("examples/example1/output.log", "r");
-        assert(output_file != NULL);
+        close(pipefd[1]);
+        FILE* output_file = fdopen(pipefd[0], "r");
 
         scan(datas, pids, output_file);
+        close(pipefd[0]);
     }
 }
 
@@ -98,12 +99,16 @@ void test2() {
     };
 
     int pids[4] = {0, 0, 0, 0};
+    int pipefd[2];
+    pipe(pipefd);
 
     int pid = fork();
+
     if (pid == 0) {
         
-        FILE* output_file = fopen("examples/example2/output.log", "w");
-        dup2(fileno(output_file), 1);
+        close(pipefd[0]);
+        dup2(pipefd[1], 1);
+        close(pipefd[1]);
 
         char* args[6] = {
             "./sched_sim.out", 
@@ -122,12 +127,12 @@ void test2() {
         waitpid(pid, &status, 0);
         assert(status == 0);
 
-        FILE* output_file = fopen("examples/example2/output.log", "r");
-        assert(output_file != NULL);
+        close(pipefd[1]);
+        FILE* output_file = fdopen(pipefd[0], "r");
 
         scan(datas, pids, output_file);
+        close(pipefd[0]);
     }
-
 }
 
 int main(int argc, char** argv) {
