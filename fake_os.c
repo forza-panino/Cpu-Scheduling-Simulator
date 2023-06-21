@@ -5,8 +5,13 @@
 
 #include "fake_os.h"
 
+#ifdef _PREDICTION_DEBUG_
 #define MEASURE_WEIGHT 0.35
 #define DEFAULT_PREDICTION 1
+#else
+#define MEASURE_WEIGHT 0.35
+#define DEFAULT_PREDICTION 1
+#endif
 
 
 void FakeOS_init(FakeOS* os) {
