@@ -5,6 +5,7 @@
 
 FakeOS os;
 
+#ifdef _PREDICTION_DEBUG_
 typedef struct {
   int quantum;
 } SchedRRArgs;
@@ -37,13 +38,25 @@ void schedRR(FakeOS* os, void* args_){
     List_pushFront(&pcb->events, (ListItem*)qe);
   }
 };
+#else
+// TODO: struct
+void schedSJF(FakeOS* os, void* args_){
+  printf("Hello world from SJF!\n");
+};
+#endif
 
 int main(int argc, char** argv) {
   FakeOS_init(&os);
+
+  #ifdef _PREDICTION_DEBUG_
   SchedRRArgs srr_args;
   srr_args.quantum=5;
   os.schedule_args=&srr_args;
   os.schedule_fn=schedRR;
+  #else
+  os.schedule_fn=schedSJF;
+  os.schedule_args=0; //TODO
+  #endif
   
   for (int i=1; i<argc; ++i){
     FakeProcess new_process;
