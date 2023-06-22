@@ -43,9 +43,41 @@ void schedRR(FakeOS* os, void* args_){
   }
 };
 #else
-// TODO: struct
+typedef struct {
+  int quantum;
+  int time;
+} SchedSJFArgs;
+
 void schedSJF(FakeOS* os, void* args_){
-  printf("Hello world from SJF!\n");
+  SchedSJFArgs* args=(SchedSJFArgs*)args_;
+
+  ++(args->time);
+
+  // look for the first process in ready
+  // if none, return
+  if (!os->ready->size){
+    printf("No process in ready\n");
+    return;
+  }
+
+  //printf("time: %d, quantum: %d\n", args->time, args->quantum);
+  //printf("remainder: %d\n", args->time % args->quantum);
+  if ((args->time %= args->quantum) && os->running){
+    return;
+  }
+
+  args->time=0;
+  printf("[SCHEDULER ACTIVATING]\n");
+
+  // look if there is a process in running
+  if (os->running) {
+    Heap_insert(os->ready, (HeapItem*)os->running);
+    os->running=0;
+  }
+
+  // extract the first process from ready
+  os->running = (FakePCB*)Heap_extractMin(os->ready);
+
 };
 #endif
 
@@ -58,8 +90,11 @@ int main(int argc, char** argv) {
   os.schedule_args=&srr_args;
   os.schedule_fn=schedRR;
   #else
+  SchedSJFArgs ssjf_args;
+  ssjf_args.quantum=2;
+  ssjf_args.time=-1;
   os.schedule_fn=schedSJF;
-  os.schedule_args=0; //TODO
+  os.schedule_args=&ssjf_args;
   #endif
 
   #ifndef _PREDICTION_DEBUG_

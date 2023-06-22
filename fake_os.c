@@ -214,6 +214,9 @@ void FakeOS_simStep(FakeOS* os){
     assert(e->type==CPU);
     e->duration--;
     running->real_duration++;
+    #ifndef _PREDICTION_DEBUG_
+    running->heap.key--;
+    #endif
     printf("\t\tremaining time:%d\n",e->duration);
     if (e->duration==0){
       printf("\t\tend burst\n");
@@ -256,10 +259,16 @@ void FakeOS_simStep(FakeOS* os){
 
 
   // call schedule, if defined
-  #if defined(_PREDICTION_DEBUG_) || !defined(_NPRMPTV_SJF_DEBUG_)
+  #if defined(_PREDICTION_DEBUG_)
   if (os->schedule_fn && ! os->running){
     (*os->schedule_fn)(os, os->schedule_args); 
   }
+  #else
+  #ifndef _NPRMPTV_SJF_DEBUG_
+  if (os->schedule_fn){
+    (*os->schedule_fn)(os, os->schedule_args); 
+  }
+  #endif
   #endif
 
   // if running not defined and ready queue not empty
@@ -268,7 +277,8 @@ void FakeOS_simStep(FakeOS* os){
   if (! os->running && os->ready.first) {
     os->running=(FakePCB*) List_popFront(&os->ready);
   }
-  #else
+  #endif
+  #ifdef _NPRMPTV_SJF_DEBUG_
   if (! os->running && os->ready->size) {
     os->running=(FakePCB*) Heap_extractMin(os->ready);
     printf("\t\t\tready size after extraction:%d\n", os->ready->size);
