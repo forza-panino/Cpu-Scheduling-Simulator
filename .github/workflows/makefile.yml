@@ -57,13 +57,13 @@ jobs:
       run: chmod +x unit_tests/non_preemptive_sjf/*.out
 
     - name: Run unit tests for minheap with generics
-      run: ./unit_tests/minheap/test_with_generics.out
+      run: cd unit_tests/minheap && ./test_with_generics.out
 
     - name: Run unit tests for minheap with specialised types
-      run: ./unit_tests/minheap/test_with_specialised.out
+      run: cd unit_tests/minheap && ./test_with_specialised.out
 
     - name: Run unit tests for burst prediction
-      run: ./unit_tests/burst_prediction/burst_prediction_test.out
+      run: cd unit_tests/burst_prediction && ./burst_prediction_test.out
 
     - name: Run unit tests for non-preemptive sjf scheduler
-      run: ./unit_tests/non_preemptive_sjf/nprmptv_sjf_test.out
+      run: cd unit_tests/non_preemptive_sjf && ./nprmptv_sjf_test.out
