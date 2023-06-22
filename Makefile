@@ -1,13 +1,14 @@
 CC=gcc
-CCOPTS=--std=gnu99 -Wall -D_LIST_DEBUG_
+CCOPTS=--std=gnu99 -Wall -D_LIST_DEBUG_ -g -ggdb3
 CCLIBS=-lm
 AR=ar
 
 OBJS=linked_list.o\
      fake_process.o\
-     fake_os.o
+     fake_os.o\
+	 minheap.o
 
-HEADERS=linked_list.h  fake_process.h
+HEADERS=linked_list.h  fake_process.h minheap.h
 
 BINS=fake_process_test sched_sim
 

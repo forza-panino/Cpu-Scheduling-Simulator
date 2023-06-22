@@ -5,6 +5,10 @@
 
 FakeOS os;
 
+#ifndef _PREDICTION_DEBUG_
+#include "minheap.h"
+#endif
+
 #ifdef _PREDICTION_DEBUG_
 typedef struct {
   int quantum;
@@ -57,6 +61,12 @@ int main(int argc, char** argv) {
   os.schedule_fn=schedSJF;
   os.schedule_args=0; //TODO
   #endif
+
+  #ifndef _PREDICTION_DEBUG_
+  MinHeap heap;
+  Heap_init(&heap);
+  os.ready=&heap;
+  #endif
   
   for (int i=1; i<argc; ++i){
     FakeProcess new_process;
@@ -70,10 +80,19 @@ int main(int argc, char** argv) {
     }
   }
   printf("num processes in queue %d\n", os.processes.size);
+  #ifdef _PREDICTION_DEBUG_
   while(os.running
         || os.ready.first
         || os.waiting.first
         || os.processes.first){
     FakeOS_simStep(&os);
   }
+  #else
+  while(os.running
+        || os.ready->size
+        || os.waiting.first
+        || os.processes.first){
+    FakeOS_simStep(&os);
+  }
+  #endif
 }
