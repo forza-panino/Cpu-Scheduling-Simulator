@@ -22,6 +22,9 @@ jobs:
 
     - name: Build unit tests for burst prediction
       run: cd unit_tests/burst_prediction/ && make -f burst_prediction_test.mk
+
+    - name: Build unit tests for non-preemptive sjf scheduler
+      run: cd unit_tests/non_preemptive_sjf/ && make -f nprmptv_sjf_test.mk
       
     - name: Upload minheap unit test build artifact for generics
       uses: actions/upload-artifact@v3.1.2
@@ -40,6 +43,12 @@ jobs:
       with:
         name: burst_prediction_unit_test_artifact
         path: unit_tests/burst_prediction/burst_prediction_test.out
+
+    - name: Upload non-preemptive sjf scheduler unit test build artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: npprmptv_sjf_unit_test_artifact
+        path: unit_tests/non_preemptive_sjf/nprmptv_sjf_test.out
 
   tests:
     needs: build
@@ -63,12 +72,20 @@ jobs:
       with:
         name: burst_prediction_unit_test_artifact
         path: unit_tests/burst_prediction/
+
+    - uses: actions/download-artifact@master
+      with:
+        name: npprmptv_sjf_unit_test_artifact
+        path: unit_tests/non_preemptive_sjf/
     
     - name: enable execution permission of minheap artifacts
       run: chmod +x unit_tests/minheap/*.out
 
     - name: enable execution permission of burst prediction artifacts
       run: chmod +x unit_tests/burst_prediction/*.out
+
+    - name: enable execution permission of non-preemptive sjf scheduler artifacts
+      run: chmod +x unit_tests/non_preemptive_sjf/*.out
 
     - name: Run unit tests for minheap with generics
       run: ./unit_tests/minheap/test_with_generics.out
@@ -78,3 +95,6 @@ jobs:
 
     - name: Run unit tests for burst prediction
       run: ./unit_tests/burst_prediction/burst_prediction_test.out
+
+    - name: Run unit tests for non-preemptive sjf scheduler
+      run: ./unit_tests/non_preemptive_sjf/nprmptv_sjf_test.out
