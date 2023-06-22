@@ -19,8 +19,7 @@ ListItem* List_find(ListHead* head, ListItem* item) {
 }
 
 ListItem* List_insert(ListHead* head, ListItem* prev, ListItem* item) {
-  if (item->next || item->prev)
-    return 0;
+  if (item->next || item->prev) return 0;
   
 #ifdef _LIST_DEBUG_
   // we check that the element is not in the list
