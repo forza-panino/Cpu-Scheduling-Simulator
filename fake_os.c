@@ -256,7 +256,7 @@ void FakeOS_simStep(FakeOS* os){
 
 
   // call schedule, if defined
-  #ifdef _PREDICTION_DEBUG_
+  #if defined(_PREDICTION_DEBUG_) || !defined(_NPRMPTV_SJF_DEBUG_)
   if (os->schedule_fn && ! os->running){
     (*os->schedule_fn)(os, os->schedule_args); 
   }
