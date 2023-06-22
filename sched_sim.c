@@ -9,6 +9,12 @@ FakeOS os;
 #include "minheap.h"
 #endif
 
+#ifdef _PRMPTV_SJF_TEST_
+#define QUANTUM 2
+#else
+#define QUANTUM 2
+#endif
+
 #ifdef _PREDICTION_DEBUG_
 typedef struct {
   int quantum;
@@ -91,7 +97,7 @@ int main(int argc, char** argv) {
   os.schedule_fn=schedRR;
   #else
   SchedSJFArgs ssjf_args;
-  ssjf_args.quantum=2;
+  ssjf_args.quantum=QUANTUM;
   ssjf_args.time=-1;
   os.schedule_fn=schedSJF;
   os.schedule_args=&ssjf_args;
