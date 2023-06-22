@@ -39,7 +39,9 @@ void updatePredictionPCB(FakePCB* pcb) {
   int measure = pcb->real_duration;
   int new_prediction = round(MEASURE_WEIGHT*measure + (1-MEASURE_WEIGHT)*old_prediction);
   pcb->predicted_duration = new_prediction;
+  #ifndef _PREDICTION_DEBUG_
   pcb->heap.key = new_prediction;
+  #endif
 }
 
 void FakeOS_createProcess(FakeOS* os, FakeProcess* p) {
@@ -200,7 +202,11 @@ void FakeOS_simStep(FakeOS* os){
   // and reschedule process
   // if last event, destroy running
   FakePCB* running=os->running;
+  #ifndef _PREDICTION_DEBUG_
   printf("\tready size:%d\n", os->ready->size);
+  #else
+  printf("\tready size:%d\n", os->ready.size);
+  #endif
   printf("\trunning pid: %d\n", running?running->pid:-1);
   printf("\tremaining events:%d\n", running?running->events.size:-1);
   if (running) {
