@@ -59,6 +59,9 @@ jobs:
     - name: enable execution permission of non-preemptive sjf scheduler artifacts
       run: chmod +x unit_tests/non_preemptive_sjf/*.out
 
+    - name: enable execution permission of preemptive sjf scheduler artifacts
+      run: chmod +x unit_tests/preemptive_sjf/*.out
+
     - name: Run unit tests for minheap with generics
       run: cd unit_tests/minheap && ./test_with_generics.out
 
