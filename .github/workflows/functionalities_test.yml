@@ -28,6 +28,9 @@ jobs:
 
     - name: Build unit tests for preemptive sjf scheduler
       run: cd unit_tests/preemptive_sjf/ && make -f prmptv_sjf_test.mk
+
+    - name: Build unit tests for multi cpu scheduler
+      run: cd unit_tests/multi_cpu/ && make -f multi_cpu_test.mk
       
     - name: Upload unit tests build artifact
       uses: actions/upload-artifact@v3.1.2
@@ -62,6 +65,9 @@ jobs:
     - name: enable execution permission of preemptive sjf scheduler artifacts
       run: chmod +x unit_tests/preemptive_sjf/*.out
 
+    - name: enable execution permission of multi cpu scheduler artifacts
+      run: chmod +x unit_tests/multi_cpu/*.out
+
     - name: Run unit tests for minheap with generics
       run: cd unit_tests/minheap && ./test_with_generics.out
 
@@ -76,3 +82,6 @@ jobs:
 
     - name: Run unit tests for preemptive sjf scheduler
       run: cd unit_tests/preemptive_sjf && ./prmptv_sjf_test.out
+
+    - name: Run unit tests for multi cpu scheduler
+      run: cd unit_tests/multi_cpu && ./multi_cpu_test.out
