@@ -25,7 +25,11 @@ struct FakeOS;
 typedef void (*ScheduleFn)(struct FakeOS* os, void* args);
 
 typedef struct FakeOS{
+  #ifndef _MULTI_CORE_
   FakePCB* running;
+  #else
+  FakePCB** running;
+  #endif
   #ifdef _PREDICTION_DEBUG_
   ListHead ready;
   #else
@@ -35,6 +39,10 @@ typedef struct FakeOS{
   int timer;
   ScheduleFn schedule_fn;
   void* schedule_args;
+
+  #ifdef _MULTI_CORE_
+  int num_cpus;
+  #endif
 
   ListHead processes;
 } FakeOS;

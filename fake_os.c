@@ -49,7 +49,13 @@ void FakeOS_createProcess(FakeOS* os, FakeProcess* p) {
   assert(p->arrival_time==os->timer && "time mismatch in creation");
   // we check that in the list of PCBs there is no
   // pcb having the same pid
+  #ifndef _MULTI_CORE_
   assert( (!os->running || os->running->pid!=p->pid) && "pid taken");
+  #else
+  for (int i=0; i < os->num_cpus; i++) {
+    assert( (!os->running[i] || os->running[i]->pid!=p->pid) && "pid taken");
+  }
+  #endif
 
   #ifdef _PREDICTION_DEBUG_
   ListItem* aux=os->ready.first;
@@ -201,7 +207,12 @@ void FakeOS_simStep(FakeOS* os){
   // if next event IO, update CPU burst prediction and reset real duration
   // and reschedule process
   // if last event, destroy running
+  #ifdef _MULTI_CORE_
+  for (int i = 0; i < os->num_cpus; i++) {
+    FakePCB* running=os->running[i];
+  #else
   FakePCB* running=os->running;
+  #endif
   #ifndef _PREDICTION_DEBUG_
   printf("\tready size:%d\n", os->ready->size);
   #else
@@ -253,9 +264,16 @@ void FakeOS_simStep(FakeOS* os){
           break;
         }
       }
+      #ifndef _MULTI_CORE_
       os->running = 0;
+      #else
+      os->running[i] = 0;
+      #endif
     }
   }
+  #ifdef _MULTI_CORE_
+  }
+  #endif
 
 
   // call schedule, if defined
