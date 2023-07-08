@@ -50,14 +50,25 @@ void schedRR(FakeOS* os, void* args_){
 };
 #else
 typedef struct {
+  #ifndef _MULTI_CORE_
   int quantum;
   int time;
+  #else
+  int* quantum;
+  int* time;
+  #endif
 } SchedSJFArgs;
 
 void schedSJF(FakeOS* os, void* args_){
   SchedSJFArgs* args=(SchedSJFArgs*)args_;
 
+  #ifndef _MULTI_CORE_
   ++(args->time);
+  #else
+  for (int i=0; i<os->num_cpus; ++i){
+    ++(args->time[i]);
+  }
+  #endif
 
   // look for the first process in ready
   // if none, return
@@ -66,8 +77,7 @@ void schedSJF(FakeOS* os, void* args_){
     return;
   }
 
-  //printf("time: %d, quantum: %d\n", args->time, args->quantum);
-  //printf("remainder: %d\n", args->time % args->quantum);
+  #ifndef _MULTI_CORE_
   if ((args->time %= args->quantum) && os->running){
     return;
   }
@@ -83,6 +93,31 @@ void schedSJF(FakeOS* os, void* args_){
 
   // extract the first process from ready
   os->running = (FakePCB*)Heap_extractMin(os->ready);
+  #else
+  for (int i=0; i<os->num_cpus; ++i){
+    if ((args->time[i] %= args->quantum[i]) && os->running[i]){
+      continue;
+    }
+
+    printf("[SCHEDULER ACTIVATING]\n");
+    printf("\t[CPU %d]\n", i);
+
+    args->time[i]=0;
+
+    // look if there is a process in running
+    if (os->running[i]) {
+      Heap_insert(os->ready, (HeapItem*)os->running[i]);
+      os->running[i]=0;
+    }
+  }
+
+  // extract the first process from ready
+  for (int i=0; i<os->num_cpus; ++i){
+    if (!os->running[i]) {
+      os->running[i] = (FakePCB*)Heap_extractMin(os->ready);
+    }
+  }
+  #endif
 
 };
 #endif
@@ -97,8 +132,16 @@ int main(int argc, char** argv) {
   os.schedule_fn=schedRR;
   #else
   SchedSJFArgs ssjf_args;
+  #ifndef _MULTI_CORE_
   ssjf_args.quantum=QUANTUM;
+  #endif
+  #ifndef _MULTI_CORE_
   ssjf_args.time=-1;
+  #else
+  ssjf_args.time=(int*)malloc(sizeof(int)*os.num_cpus);
+  for (int i=0; i<os.num_cpus; ++i)
+    ssjf_args.time[i]=-1;
+  #endif
   os.schedule_fn=schedSJF;
   os.schedule_args=&ssjf_args;
   #endif
@@ -109,7 +152,30 @@ int main(int argc, char** argv) {
   os.ready=&heap;
   #endif
   
+  #ifdef _MULTI_CORE_
+  if (argc < 2) {
+    printf("Usage: %s <num_cpus> <process1> <process2> ...\n", argv[0]);
+    return 1;
+  }
+  #endif
+
   for (int i=1; i<argc; ++i){
+    #ifdef _MULTI_CORE_
+    if (i==1){
+      os.num_cpus=atoi(argv[i]);
+      if (os.num_cpus<1){
+        printf("Invalid number of cpus\n");
+        return 1;
+      }
+      os.running=(FakePCB**)malloc(sizeof(FakePCB*)*os.num_cpus);
+      for (int j=0; j<os.num_cpus; ++j)
+        os.running[j]=0;
+      ssjf_args.quantum=(int*)malloc(sizeof(int)*os.num_cpus);
+      for (int j=0; j<os.num_cpus; ++j)
+        ssjf_args.quantum[j]=QUANTUM;
+      continue;
+    }
+    #endif
     FakeProcess new_process;
     int num_events=FakeProcess_load(&new_process, argv[i]);
     printf("loading [%s], pid: %d, events:%d",
@@ -129,11 +195,23 @@ int main(int argc, char** argv) {
     FakeOS_simStep(&os);
   }
   #else
+  #ifndef _MULTI_CORE_
   while(os.running
         || os.ready->size
         || os.waiting.first
         || os.processes.first){
     FakeOS_simStep(&os);
   }
+  #else
+  while(1){
+    int running=0;
+    for (int i=0; i<os.num_cpus; ++i){
+      running+=os.running[i]!=0;
+    }
+    if (!running && !os.ready->size && !os.waiting.first && !os.processes.first)
+      break;
+    FakeOS_simStep(&os);
+  }
+  #endif
   #endif
 }

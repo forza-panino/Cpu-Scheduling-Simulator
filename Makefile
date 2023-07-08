@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS=--std=gnu99 -Wall -D_LIST_DEBUG_ -g -ggdb3
+CCOPTS=--std=gnu99 -Wall -D_LIST_DEBUG_ -D_MULTI_CORE_
 CCLIBS=-lm
 AR=ar
 
