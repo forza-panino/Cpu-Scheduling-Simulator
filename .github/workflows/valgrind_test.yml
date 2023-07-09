@@ -53,6 +53,9 @@ jobs:
         name: unit_test_artifact
         path: unit_tests
 
+    - name: install valgrind
+      run: sudo apt-get install valgrind -y
+
     - name: enable execution permission of minheap artifacts
       run: chmod +x unit_tests/minheap/*.out && chmod +x unit_tests/minheap/*.sh
 
