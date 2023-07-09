@@ -3,7 +3,6 @@ name: Valgrind testing
 on:
   workflow_run:
     workflows: ["Unit testing functionalities"]
-    branches: [main]
     types: 
       - completed
 
