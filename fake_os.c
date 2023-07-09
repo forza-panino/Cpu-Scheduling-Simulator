@@ -21,12 +21,12 @@ void FakeOS_init(FakeOS* os) {
   #ifdef _PREDICTION_DEBUG_
   List_init(&os->ready);
   #else
-  os->ready=malloc(sizeof(MinHeap));
-  Heap_init(os->ready);
+  os->ready=0;
   FakePCB* tmp=(FakePCB*) malloc(sizeof(FakePCB));
   uintptr_t heap = (uintptr_t)&tmp->heap;
   uintptr_t list = (uintptr_t)&tmp->list;
   offset_heap_list = list - heap;
+  free(tmp);
   #endif
   List_init(&os->waiting);
   List_init(&os->processes);
@@ -308,4 +308,10 @@ void FakeOS_simStep(FakeOS* os){
 }
 
 void FakeOS_destroy(FakeOS* os) {
+  #ifndef _PREDICTION_DEBUG_
+  if (os->ready) {
+    Heap_destroy(os->ready);
+    free(os->ready);
+  }
+  #endif
 }

@@ -10,7 +10,12 @@ void Heap_init(MinHeap* heap) {
 void Heap_insert(MinHeap* heap, HeapItem* item) {
   if (heap->size==heap->capacity) {
 		heap->capacity*=2;
-		heap->items=(HeapItem**)realloc(heap->items, sizeof(HeapItem*)*heap->capacity);
+		HeapItem** tmp = (HeapItem**)realloc(heap->items, sizeof(HeapItem*)*heap->capacity);
+    if (tmp) {
+      heap->items=tmp;
+    } else {
+      exit(1);
+    }
 	}
   heap->items[heap->size]=item;
   ++heap->size;
@@ -55,12 +60,21 @@ HeapItem* Heap_extractMin(MinHeap* heap) {
   return min;
 }
 
+void Heap_destroy(MinHeap* heap) {
+  free(heap->items);
+}
+
 #ifdef _HEAP_DEBUG_
 void Heap_fill_null(MinHeap* heap, int num_nulls) {
   for (int i=0; i<num_nulls; ++i){
 		if (heap->size==heap->capacity) {
 			heap->capacity*=2;
-			heap->items=(HeapItem**)realloc(heap->items, sizeof(HeapItem*)*heap->capacity);
+			HeapItem** tmp = (HeapItem**)realloc(heap->items, sizeof(HeapItem*)*heap->capacity);
+      if (tmp) {
+        heap->items=tmp;
+      } else {
+        exit(1);
+      }
 		}
   	heap->items[heap->size]=0;
   	++heap->size;
