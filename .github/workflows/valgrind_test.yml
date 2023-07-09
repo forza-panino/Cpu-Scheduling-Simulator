@@ -7,6 +7,39 @@ on:
       - completed
 
 jobs:
+
+  build:
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build core
+      run: make
+
+    - name: Build unit tests for minheap
+      run: cd unit_tests/minheap/ && make -f minheap_test.mk
+
+    - name: Build unit tests for burst prediction
+      run: cd unit_tests/burst_prediction/ && make -f burst_prediction_test.mk
+
+    - name: Build unit tests for non-preemptive sjf scheduler
+      run: cd unit_tests/non_preemptive_sjf/ && make -f nprmptv_sjf_test.mk
+
+    - name: Build unit tests for preemptive sjf scheduler
+      run: cd unit_tests/preemptive_sjf/ && make -f prmptv_sjf_test.mk
+
+    - name: Build unit tests for multi cpu scheduler
+      run: cd unit_tests/multi_cpu/ && make -f multi_cpu_test.mk
+      
+    - name: Upload unit tests build artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: unit_test_artifact
+        path: unit_tests
+
   tests:
 
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
