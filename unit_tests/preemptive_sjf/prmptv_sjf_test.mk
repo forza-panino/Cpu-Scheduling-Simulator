@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS=--std=gnu99 -Wall -D_PRMPTV_SJF_TEST_
+CCOPTS=--std=gnu99 -Wall -D_PRMPTV_SJF_TEST_ -g -ggdb3
 CCLIBS=-lm
 AR=ar
 

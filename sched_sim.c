@@ -59,6 +59,15 @@ typedef struct {
   #endif
 } SchedSJFArgs;
 
+#ifdef _MULTI_CORE_
+void schedSimDestroy(void* args_) {
+  SchedSJFArgs* args=(SchedSJFArgs*)args_;
+  if (args->time)     free(args->time);
+  if (args->quantum)  free(args->quantum);
+  if (os.running)     free(os.running);
+}
+#endif
+
 void schedSJF(FakeOS* os, void* args_){
   SchedSJFArgs* args=(SchedSJFArgs*)args_;
 
@@ -123,6 +132,7 @@ void schedSJF(FakeOS* os, void* args_){
 #endif
 
 int main(int argc, char** argv) {
+  int ret = 0;
   FakeOS_init(&os);
 
   #ifdef _PREDICTION_DEBUG_
@@ -132,30 +142,21 @@ int main(int argc, char** argv) {
   os.schedule_fn=schedRR;
   #else
   SchedSJFArgs ssjf_args;
-  #ifndef _MULTI_CORE_
-  ssjf_args.quantum=QUANTUM;
-  #endif
-  #ifndef _MULTI_CORE_
-  ssjf_args.time=-1;
-  #else
-  ssjf_args.time=(int*)malloc(sizeof(int)*os.num_cpus);
-  for (int i=0; i<os.num_cpus; ++i)
-    ssjf_args.time[i]=-1;
-  #endif
+  ssjf_args.quantum=0;
+  ssjf_args.time=0;
   os.schedule_fn=schedSJF;
   os.schedule_args=&ssjf_args;
   #endif
 
   #ifndef _PREDICTION_DEBUG_
-  MinHeap heap;
-  Heap_init(&heap);
-  os.ready=&heap;
+  os.ready = (MinHeap*)malloc(sizeof(MinHeap));
+  Heap_init(os.ready);
   #endif
   
   #ifdef _MULTI_CORE_
   if (argc < 2) {
     printf("Usage: %s <num_cpus> <process1> <process2> ...\n", argv[0]);
-    return 1;
+    goto  ERROR;
   }
   #endif
 
@@ -165,7 +166,7 @@ int main(int argc, char** argv) {
       os.num_cpus=atoi(argv[i]);
       if (os.num_cpus<1){
         printf("Invalid number of cpus\n");
-        return 1;
+        goto ERROR;
       }
       os.running=(FakePCB**)malloc(sizeof(FakePCB*)*os.num_cpus);
       for (int j=0; j<os.num_cpus; ++j)
@@ -173,8 +174,15 @@ int main(int argc, char** argv) {
       ssjf_args.quantum=(int*)malloc(sizeof(int)*os.num_cpus);
       for (int j=0; j<os.num_cpus; ++j)
         ssjf_args.quantum[j]=QUANTUM;
+      ssjf_args.time=(int*)malloc(sizeof(int)*os.num_cpus);
+      for (int i=0; i<os.num_cpus; ++i)
+        ssjf_args.time[i]=-1;
       continue;
     }
+    #endif
+    #if !defined(_MULTI_CORE_) && !defined(_PREDICTION_DEBUG_)
+      ssjf_args.time=-1;
+      ssjf_args.quantum=QUANTUM;
     #endif
     FakeProcess new_process;
     int num_events=FakeProcess_load(&new_process, argv[i]);
@@ -214,4 +222,16 @@ int main(int argc, char** argv) {
   }
   #endif
   #endif
+
+  goto CLEAN;
+#ifdef _MULTI_CORE_
+ERROR:
+  ret=1;
+#endif
+CLEAN:
+  #ifdef _MULTI_CORE_
+  schedSimDestroy(&ssjf_args);
+  #endif
+  FakeOS_destroy(&os);
+  return ret;
 }

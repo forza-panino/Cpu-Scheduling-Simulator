@@ -9,6 +9,7 @@ void test_init() {
   assert(heap.size==0);
   assert(heap.capacity==1);
   assert(heap.items);
+  Heap_destroy(&heap);
 }
 
 void test_fill_null() {
@@ -25,6 +26,7 @@ void test_fill_null() {
   assert(heap.capacity==32);
   for (int i=0; i<heap.size; ++i)
     assert(heap.items[i]==0);
+  Heap_destroy(&heap);
 }
 
 void test_insert_1() {
@@ -81,6 +83,8 @@ void test_insert_1() {
 	assert(heap.items[3]->key==6);
 	assert(heap.items[4]->key==5);
 	assert(heap.items[5]->key==4);
+
+	Heap_destroy(&heap);
 
 }
 
@@ -139,6 +143,7 @@ void test_insert_2() {
 	assert(heap.items[4]->key==5);
 	assert(heap.items[5]->key==6);
 
+	Heap_destroy(&heap);
 }
 
 void test_extractMin_1() {
@@ -221,6 +226,7 @@ void test_extractMin_1() {
 	assert(heap.size==0);
 	assert(heap.capacity==8);
 
+	Heap_destroy(&heap);
 }
 
 void test_extractMin_2() {
@@ -302,6 +308,8 @@ void test_extractMin_2() {
 	assert(min==NULL);
 	assert(heap.size==0);
 	assert(heap.capacity==8);
+
+	Heap_destroy(&heap);
 }
 
 int main(int argc, char** argv) {
