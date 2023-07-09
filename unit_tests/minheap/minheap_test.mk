@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS=--std=gnu99 -Wall -D_HEAP_DEBUG_
+CCOPTS=--std=gnu99 -Wall -D_HEAP_DEBUG_ -g -ggdb3
 AR=ar
 
 OBJS=test_with_generics.o

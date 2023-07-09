@@ -1,0 +1,52 @@
+name: Valgrind testing
+
+on:
+  workflow_run:
+    workflows: ["Unit testing functionalities"]
+    branches: [main]
+    types: 
+      - completed
+
+jobs:
+  tests:
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/download-artifact@master
+      with:
+        name: unit_test_artifact
+        path: unit_tests
+
+    - name: enable execution permission of minheap artifacts
+      run: chmod +x unit_tests/minheap/*.out && chmod +x unit_tests/minheap/*.sh
+
+    - name: enable execution permission of burst prediction artifacts
+      run: chmod +x unit_tests/burst_prediction/*.out && chmod +x unit_tests/burst_prediction/*.sh
+
+    - name: enable execution permission of non-preemptive sjf artifacts
+      run: chmod +x unit_tests/non_preemptive_sjf/*.out && chmod +x unit_tests/non_preemptive_sjf/*.sh
+    
+    - name: enable execution permission of preemptive sjf artifacts
+      run: chmod +x unit_tests/preemptive_sjf/*.out && chmod +x unit_tests/preemptive_sjf/*.sh
+
+    - name: enable execution permission of multi cpu artifacts
+      run: chmod +x unit_tests/multi_cpu/*.out && chmod +x unit_tests/multi_cpu/*.sh
+
+    - name: Run minheap test
+      run: cd unit_tests/minheap/ && ./valgrind_test.sh
+
+    - name: Run burst prediction test
+      run: cd unit_tests/burst_prediction/ && ./valgrind_test.sh
+
+    - name: Run non-preemptive sjf test
+      run: cd unit_tests/non_preemptive_sjf/ && ./valgrind_test.sh
+
+    - name: Run preemptive sjf test
+      run: cd unit_tests/preemptive_sjf/ && ./valgrind_test.sh
+
+    - name: Run multi cpu test
+      run: cd unit_tests/multi_cpu/ && ./valgrind_test.sh

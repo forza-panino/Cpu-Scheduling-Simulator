@@ -53,4 +53,6 @@ int main(int argc, char** argv) {
 
     min = Heap_extractMin(&heap);
     assert(min==NULL);
+
+    Heap_destroy(&heap);
 }
