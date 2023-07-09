@@ -180,8 +180,9 @@ int main(int argc, char** argv) {
       continue;
     }
     #endif
-    #ifndef _MULTI_CORE_
+    #if !defined(_MULTI_CORE_) && !defined(_PREDICTION_DEBUG_)
       ssjf_args.time=-1;
+      ssjf_args.quantum=QUANTUM;
     #endif
     FakeProcess new_process;
     int num_events=FakeProcess_load(&new_process, argv[i]);
@@ -223,8 +224,10 @@ int main(int argc, char** argv) {
   #endif
 
   goto CLEAN;
+#ifdef _MULTI_CORE_
 ERROR:
   ret=1;
+#endif
 CLEAN:
   #ifdef _MULTI_CORE_
   schedSimDestroy(&ssjf_args);
